@@ -43,6 +43,7 @@
         };
 
         firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
 
         function auth() {
           alert("このアプリはGoogleでのログインが必要となります。");
@@ -69,6 +70,13 @@
           var pass = $("#pass").val();
           if(!room || !pass){alert("input error");return;}
           var user={p:1, name:name, hand:null, time:null}
+          var roomdb = db.collection("room").doc(room)
+          roomdb.set({
+            pass:pass,
+            user1:user,
+            user2:null,
+            wait:[]
+          });
         });
       });
     </script>

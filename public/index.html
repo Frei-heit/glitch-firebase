@@ -1,46 +1,16 @@
 <html>
-  <head> </head>
+  <head>
+    
+  </head>
   <body>
-    <div>あいうえお</div>
-    <div style="display: none;">
-      対戦
+    <div>
+      マッチング
     </div>
-
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="/__/firebase/6.2.0/firebase-app.js"></script>
-
-    <!-- TODO: Add SDKs for Firebase products that you want to use
-     https://firebase.google.com/docs/web/setup#available-libraries -->
-    <script src="/__/firebase/6.2.0/firebase-auth.js"></script>
-    <script src="/__/firebase/6.2.0/firebase-firestore.js"></script>
-    <!-- Initialize Firebase -->
-    <script src="/__/firebase/init.js"></script>
-
-    <!--my js-->
-    <script type="text/javascript">
-      window.onload = function(){
-        alert("abc")
-        var provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithRedirect(provider)
-        firebase.auth().getRedirectResult().then(function(result) {
-          if (result.credential) {
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            var token = result.credential.accessToken;
-            // ...
-          }
-          // The signed-in user info.
-          var user = result.user;
-        }).catch(function(error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // The email of the user's account used.
-          var email = error.email;
-          // The firebase.auth.AuthCredential type that was used.
-          var credential = error.credential;
-          // ...
-          alert(errorCode)
-        });
-    </script>
+    <div style="display: none;">
+      ステータス割り振り
+    </div>
+    <div style="display: none;">
+      戦闘
+    </div>
   </body>
 </html>

@@ -1,16 +1,59 @@
 <html>
-  <head>
-    
-  </head>
+  <head> </head>
   <body>
     <div>
       マッチング
     </div>
     <div style="display: none;">
-      ステータス割り振り
+      対戦
     </div>
-    <div style="display: none;">
-      戦闘
-    </div>
+
+    <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
+
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
+
+    <script type="text/javascript">
+      var firebaseConfig = {
+        apiKey: "AIzaSyDRJRC_2rt1BdDTQjtZaZOs7d4BHUfa7V0",
+        authDomain: "glitch-48c07.firebaseapp.com",
+        databaseURL: "https://glitch-48c07.firebaseio.com",
+        projectId: "glitch-48c07",
+        storageBucket: "glitch-48c07.appspot.com",
+        appID: "1:866922273041:web:2d02ec91a5e0a790a414b0"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+
+      var provider = new firebase.auth.GoogleAuthProvider();
+
+      firebase.auth().signInWithRedirect(provider);
+      firebase
+        .auth()
+        .getRedirectResult()
+        .then(function(result) {
+          if (result.credential) {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            var token = result.credential.accessToken;
+            // ...
+          }
+          // The signed-in user info.
+          var user = result.user;
+        })
+        .catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // The email of the user's account used.
+          var email = error.email;
+          // The firebase.auth.AuthCredential type that was used.
+          var credential = error.credential;
+          // ...
+        });
+    </script>
   </body>
 </html>

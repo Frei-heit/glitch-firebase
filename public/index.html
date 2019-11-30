@@ -12,9 +12,7 @@
         マッチング<br />
         room<input type="text" name="room" id="room" /><br />
         pass<input type="text" name="pass" id="pass" />
-        <div id="createRoom">
-          部屋を作る
-        </div><br><br>
+        <input type="button" id="createRoom" value="部屋を作る"><br><br>
         <div id="joinRoom">
           部屋に入る
         </div>
@@ -95,8 +93,11 @@
             user1: user,
             user2: null,
             wait: []
-          });
-          alert("success")
+          }).then(function(){
+            alert("success")
+          }).catch(function(error){
+            alert(error)
+          })
         });
       });
     </script>

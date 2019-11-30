@@ -9,11 +9,8 @@
   <body>
     <div>
       マッチング<br>
-      room<input type="text" name="room" /><br>
-      pass<input
-        type="text"
-        name="pass"
-      />
+      room<input type="text" name="room" id="room"/><br>
+      pass<input type="text" name="pass" id="pass"/>
       <div id="createRoom">
         部屋を作る
       </div>
@@ -58,23 +55,21 @@
               var token = result.credential.accessToken;
               // The signed-in user info.
               var user = result.user;
-              $("#createRoom").click(function(){
-                $()
-              });
-              return user;
+              
+              return user.displayName;
             })
             .catch(function(error) {
-              // Handle Errors here.
-              var errorCode = error.code;
-              var errorMessage = error.message;
-              // The email of the user's account used.
-              var email = error.email;
-              // The firebase.auth.AuthCredential type that was used.
-              var credential = error.credential;
-              // ...
+              
             });
         };
-        var user = auth()
+        var name = auth();
+        if(!name){$("body").css("display:none;")};
+        $("#createRoom").click(function(){
+          var room = $("#room").val();
+          var pass = $("#pass").val();
+          if(!room || !pass){alert("input error");return;}
+          var user={p:1, name:name, hand:null, time:null}
+        });
       });
     </script>
   </body>

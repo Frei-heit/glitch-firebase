@@ -8,14 +8,16 @@
   </head>
   <body>
     <div>
-      マッチング<br>
-      room<input type="text" name="room" id="room"/><br>
-      pass<input type="text" name="pass" id="pass"/>
-      <div id="createRoom">
-        部屋を作る
-      </div>
-      <div id="joinRoom">
-        部屋に入る
+      <div id="match">
+        マッチング<br />
+        room<input type="text" name="room" id="room" /><br />
+        pass<input type="text" name="pass" id="pass" />
+        <div id="createRoom">
+          部屋を作る
+        </div>
+        <div id="joinRoom">
+          部屋に入る
+        </div>
       </div>
     </div>
     <div style="display: none;">
@@ -32,7 +34,7 @@
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
 
     <script type="text/javascript">
-      $(function(){
+      $(function() {
         var firebaseConfig = {
           apiKey: "AIzaSyDRJRC_2rt1BdDTQjtZaZOs7d4BHUfa7V0",
           authDomain: "glitch-48c07.firebaseapp.com",
@@ -56,26 +58,43 @@
               var token = result.credential.accessToken;
               // The signed-in user info.
               var user = result.user;
-              
+
               return user.displayName;
             })
-            .catch(function(error) {
-              
-            });
-        };
+            .catch(function(error) {});
+        }
         var name = auth();
-        if(!name){$("body").css("display:none;")};
-        $("#createRoom").click(function(){
+        if (!name) {
+          $("body").css("display:none;");
+        }
+        $("#createRoom").click(function() {
           var room = $("#room").val();
           var pass = $("#pass").val();
-          if(!room || !pass){alert("input error");return;}
-          var user={p:1, name:name, hand:null, time:null}
-          var roomdb = db.collection("room").doc(room)
+          if (!room || !pass) {
+            alert("input error");
+            return;
+          }
+          var user = { p: 1, name: name, hand: null, time: null };
+          var roomdb = db.collection("room").doc(room);
+          window.addEventListner(
+            "beforeunload",
+            function() {
+              roomdb
+                .delete()
+                .then(function() {
+                  return;
+                })
+                .catch(function(error) {
+                  alert(error);
+                });
+            },
+            false
+          );
           roomdb.set({
-            pass:pass,
-            user1:user,
-            user2:null,
-            wait:[]
+            pass: pass,
+            user1: user,
+            user2: null,
+            wait: []
           });
         });
       });

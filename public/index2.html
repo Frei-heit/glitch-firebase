@@ -48,15 +48,14 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        
         var provider = new firebase.auth.GoogleAuthProvider();
+        
         var db = firebase.firestore();
-        firebase.auth().onAuthStateChanged
 
         /*function auth() {
           alert("このアプリはGoogleでのログインが必要となります。");
           firebase
-            .au
+            .auth()
             .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             .then(function() {})
             .catch(function(error) {
@@ -80,8 +79,11 @@
               return;
             });
         }*/
-        
-        /*firebase
+        function authRD() {
+          
+          firebase.auth().signInWithRedirect(provider);
+        }
+        firebase
           .auth()
           .getRedirectResult()
           .then(function(result) {
@@ -103,7 +105,19 @@
             // The firebase.auth.AuthCredential type that was used.
             var credential = error.credential;
             // ...
-          });*/
+          });
+        var name;
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            name = user.displayName;
+          } else {
+          }
+        });
+        if (!name) {
+          authRD();
+        }
+        alert(name);
+        alert(name);
 
         function c() {
           alert("cccccccc");

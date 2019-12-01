@@ -96,8 +96,19 @@
           });
       }
       
-      function join(){
-        
+      function join(db, user){
+        var room = $("#room").val();
+        var pass = $("#pass").val();
+        if(!room || !pass){
+          alert("input error");
+          return;
+        }
+        var name = user.displayName;
+        var data = {p:2, name:name, hand:null, time:null}
+        var roomdb = db.collection("room").doc(room);
+        washingtonRef.update({
+          regions: firebase.firestore.FieldValue.arrayUnion()
+        });
       }
       
       $(function() {

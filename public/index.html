@@ -12,7 +12,12 @@
         マッチング<br />
         room<input type="text" name="room" id="room" /><br />
         pass<input type="text" name="pass" id="pass" />
-        <input type="button" id="createRoom" value="部屋を作る" onclick="c()"><br><br>
+        <input
+          type="button"
+          id="createRoom"
+          value="部屋を作る"
+          onclick="c()"
+        /><br /><br />
         <div id="joinRoom">
           部屋に入る
         </div>
@@ -47,6 +52,21 @@
 
         function auth() {
           alert("このアプリはGoogleでのログインが必要となります。");
+          firebase
+            .auth()
+            .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+            .then(function() {
+              // Existing and future Auth states are now persisted in the current
+              // session only. Closing the window would clear any existing state even
+              // if a user forgets to sign out.
+              // ...
+              // New sign-
+            })
+            .catch(function(error) {
+              // Handle Errors here.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+            });
           var provider = new firebase.auth.GoogleAuthProvider();
           firebase
             .auth()
@@ -59,17 +79,29 @@
 
               return user.displayName;
             })
-            .catch(function(error) {alert("alal");return;});
+            .catch(function(error) {
+              alert("alal");
+              return;
+            });
         }
-        var name = auth();
-        alert(name)
-        alert(name)
-        
-        function c(){
-          alert("cccccccc")
+        var name;
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            name = user.displayName;
+          } else {
+          }
+        });
+        if (!name) {
+          name = auth();
+        }
+        alert(name);
+        alert(name);
+
+        function c() {
+          alert("cccccccc");
         }
         function onclick() {
-          alert("clcik")
+          alert("clcik");
           var room = $("#room").val();
           var pass = $("#pass").val();
           if (!room || !pass) {
@@ -92,17 +124,20 @@
             },
             false
           );
-          roomdb.set({
-            pass: pass,
-            user1: user,
-            user2: null,
-            wait: []
-          }).then(function(){
-            alert("success")
-          }).catch(function(error){
-            alert(error)
-          })
-        };
+          roomdb
+            .set({
+              pass: pass,
+              user1: user,
+              user2: null,
+              wait: []
+            })
+            .then(function() {
+              alert("success");
+            })
+            .catch(function(error) {
+              alert(error);
+            });
+        }
       });
     </script>
   </body>

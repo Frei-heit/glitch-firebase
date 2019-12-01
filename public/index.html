@@ -22,6 +22,11 @@
         </div>
       </div>
     </div>
+    <div id="wait1">
+      <div id="people">
+        
+      </div>
+    </div>
     <div style="display: none;">
       対戦
     </div>
@@ -45,12 +50,8 @@
           return;
         }
         var name = user.displayName;
-        alert(name);
         var data = { p: 1, name: name, hand: null, time: null };
-        alert(data)
-        
         var roomdb = db.collection("room").doc(room);
-        alert(roomdb)
         /*
         window.addEventListner(
           "beforeunload",
@@ -66,7 +67,6 @@
           },
           false
         );*/
-        alert("add success")
         roomdb
           .set({
             pass: pass,
@@ -76,6 +76,10 @@
           })
           .then(function() {
             alert("success");
+            $("#match").css("display:noen;");
+            roomdb.onSnapshot(function(doc){
+              
+            })
           })
           .catch(function(error) {
             alert(error);

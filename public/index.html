@@ -16,7 +16,6 @@
           type="button"
           id="createRoom"
           value="部屋を作る"
-          onclick="create()"
         /><br /><br />
         <div id="joinRoom">
           部屋に入る
@@ -37,7 +36,7 @@
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
 
     <script type="text/javascript">
-      function create() {
+      function create(user) {
         alert("clcik");
         var room = $("#room").val();
         var pass = $("#pass").val();
@@ -45,8 +44,11 @@
           alert("input error");
           return;
         }
-        var user = { p: 1, name: name, hand: null, time: null };
+        var name =user.displayName;
+        var 
+        var data = { p: 1, name: name, hand: null, time: null };
         var roomdb = db.collection("room").doc(room);
+        alert(room+pass)
         window.addEventListner(
           "beforeunload",
           function() {
@@ -61,10 +63,11 @@
           },
           false
         );
+        alert("add success")
         roomdb
           .set({
             pass: pass,
-            user1: user,
+            user1: data,
             user2: null,
             wait: []
           })
@@ -104,6 +107,9 @@
             var email = user.email;
             var uid = user.uid;
             alert(displayName);
+            $("#createRoom").on("click",function(){
+              create(user);
+            });
             return;
           } else {
             alert("このゲームはGoogleへのログインが必要です。");

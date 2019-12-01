@@ -13,9 +13,7 @@
         room<input type="text" name="room" id="room" /><br />
         pass<input type="text" name="pass" id="pass" />
         <input type="button" id="createRoom" value="部屋を作る" /><br /><br />
-        <div id="joinRoom">
-          部屋に入る
-        </div>
+        <input type="button" id="joinRoom" value="部屋に入る" />
       </div>
     </div>
     <div id="wait1" style="display:noen;">
@@ -111,15 +109,18 @@
         var name = user.displayName;
         var data = {p:2, name:name, hand:null, time:null}
         var roomdb = db.collection("room").doc(room);
-        
+        alert(name)
         roomdb.update({
           wait: firebase.firestore.FieldValue.arrayUnion(name)
         });
-        
+        alert("wait")
         roomdb.onSnapshot(function(doc){
+          alert(doc.data())
           var name2 = doc.data().user2;
+          alert(name2)
           if(name2 == name){
             roomdb.update({user2:user}).then(function(){
+              alert("upsuc2")
               unsubscribed();
               battle();
             }).catch(function(error){
@@ -158,11 +159,14 @@
 
         firebase.auth().onAuthStateChanged(function(user) {
           if (user) {
+            alert(user.displayName)
             // User is signed in.
             $("#createRoom").on("click",function(){
+              alert("click")
               create(db, user);
             });
             $("#joinRoom").on("click",function(){
+              alert("click2")
               join(db, user);
             });
             return;

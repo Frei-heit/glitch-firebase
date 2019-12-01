@@ -12,20 +12,14 @@
         マッチング<br />
         room<input type="text" name="room" id="room" /><br />
         pass<input type="text" name="pass" id="pass" />
-        <input
-          type="button"
-          id="createRoom"
-          value="部屋を作る"
-        /><br /><br />
+        <input type="button" id="createRoom" value="部屋を作る" /><br /><br />
         <div id="joinRoom">
           部屋に入る
         </div>
       </div>
     </div>
     <div id="wait1">
-      <div id="people">
-        
-      </div>
+      <div id="people"></div>
     </div>
     <div style="display: none;">
       対戦
@@ -41,8 +35,11 @@
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
 
     <script type="text/javascript">
+      function battle(){
+        
+      }
+      
       function create(db, user) {
-        alert("clcik");
         var room = $("#room").val();
         var pass = $("#pass").val();
         if (!room || !pass) {
@@ -98,6 +95,11 @@
             alert(error);
           });
       }
+      
+      function join(){
+        
+      }
+      
       $(function() {
         var firebaseConfig = {
           apiKey: "AIzaSyDRJRC_2rt1BdDTQjtZaZOs7d4BHUfa7V0",
@@ -125,6 +127,9 @@
             // User is signed in.
             $("#createRoom").on("click",function(){
               create(db, user);
+            });
+            $("#joinRoom").on("click",function(){
+              join(db, user);
             });
             return;
           } else {

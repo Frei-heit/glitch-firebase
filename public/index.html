@@ -37,6 +37,9 @@
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
 
     <script type="text/javascript">
+      function c() {
+        alert("cccccc");
+      }
       $(function() {
         var firebaseConfig = {
           apiKey: "AIzaSyDRJRC_2rt1BdDTQjtZaZOs7d4BHUfa7V0",
@@ -48,10 +51,53 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        
+
         var provider = new firebase.auth.GoogleAuthProvider();
         var db = firebase.firestore();
-        firebase.auth().onAuthStateChanged
+        firebase
+          .auth()
+          .signInWithEmailAndPassword(email, password)
+          .catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // ...
+          });
+        email - password.html;
+
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            // User is signed in.
+            var displayName = user.displayName;
+            var email = user.email;
+            var emailVerified = user.emailVerified;
+            var photoURL = user.photoURL;
+            var isAnonymous = user.isAnonymous;
+            var uid = user.uid;
+            var providerData = user.providerData;
+            // ...
+            alert(displayName);
+            return;
+          } else {
+            alert("login!!!");
+            firebase
+              .auth()
+              .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+              .then(function() {
+                // Existing and future Auth states are now persisted in the current
+                // session only. Closing the window would clear any existing state even
+                // if a user forgets to sign out.
+                // ...
+                // New sign-in will be persisted with session persistence.
+                return firebase.auth().signInWithRedirect(provider);
+              })
+              .catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+              });
+          }
+        });
 
         /*function auth() {
           alert("このアプリはGoogleでのログインが必要となります。");
@@ -80,7 +126,7 @@
               return;
             });
         }*/
-        
+
         /*firebase
           .auth()
           .getRedirectResult()
@@ -103,12 +149,12 @@
             // The firebase.auth.AuthCredential type that was used.
             var credential = error.credential;
             // ...
-          });*/
+          });
 
         function c() {
           alert("cccccccc");
-        }
-        function onclick() {
+        }*/
+        function onclk() {
           alert("clcik");
           var room = $("#room").val();
           var pass = $("#pass").val();

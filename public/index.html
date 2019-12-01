@@ -36,7 +36,7 @@
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
 
     <script type="text/javascript">
-      function create(user) {
+      function create(db, user) {
         alert("clcik");
         var room = $("#room").val();
         var pass = $("#pass").val();
@@ -44,11 +44,14 @@
           alert("input error");
           return;
         }
-        var name =user.displayName;
-        var 
+        var name = user.displayName;
+        alert(name);
         var data = { p: 1, name: name, hand: null, time: null };
+        alert(data)
+        
         var roomdb = db.collection("room").doc(room);
-        alert(room+pass)
+        alert(roomdb)
+        /*
         window.addEventListner(
           "beforeunload",
           function() {
@@ -62,7 +65,7 @@
               });
           },
           false
-        );
+        );*/
         alert("add success")
         roomdb
           .set({
@@ -103,12 +106,8 @@
         firebase.auth().onAuthStateChanged(function(user) {
           if (user) {
             // User is signed in.
-            var displayName = user.displayName;
-            var email = user.email;
-            var uid = user.uid;
-            alert(displayName);
             $("#createRoom").on("click",function(){
-              create(user);
+              create(db, user);
             });
             return;
           } else {

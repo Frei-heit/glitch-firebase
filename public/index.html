@@ -12,7 +12,7 @@
         マッチング<br />
         room<input type="text" name="room" id="room" /><br />
         pass<input type="text" name="pass" id="pass" />
-        <input type="button" id="createRoom" value="部屋を作る" onClick="c()"><br><br>
+        <input type="button" id="createRoom" value="部屋を作る" onclick="c()"><br><br>
         <div id="joinRoom">
           部屋に入る
         </div>
@@ -59,12 +59,11 @@
 
               return user.displayName;
             })
-            .catch(function(error) {});
+            .catch(function(error) {alert("alal");return;});
         }
         var name = auth();
-        if (!name) {
-          $("body").css("display:none;");
-        };
+        alert(name)
+        
         function c(){
           alert("cccccccc")
         }

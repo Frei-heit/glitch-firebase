@@ -71,7 +71,7 @@
           .set({
             pass: pass,
             user1: data,
-            user2: null,
+            user2: {},
             wait: []
           })
           .then(function() {
@@ -81,7 +81,17 @@
               $("#people").append("<div class='waitPlayer'>"+wait[-1]+"<div>")
             });
             $(".waitPlayer").on(click,function(){
-              if(window.confirm(this.val()+"と対戦しますか？"))
+              if(window.confirm(this.val()+"と対戦しますか？")){
+                db.update({user2.name: this.val()}).then(function(){
+                  unsubscribe();
+                  battle();
+                }).catch(function(error){
+                  alert(error);
+                  this.remove();
+                });
+              }else{
+                this.remove();
+              }
             })
           })
           .catch(function(error) {

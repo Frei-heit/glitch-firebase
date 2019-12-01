@@ -36,9 +36,9 @@
 
     <script type="text/javascript">
       function battle(){
-        
+
       }
-      
+
       function create(db, user) {
         var room = $("#room").val();
         var pass = $("#pass").val();
@@ -95,7 +95,7 @@
             alert(error);
           });
       }
-      
+
       function join(db, user){
         var room = $("#room").val();
         var pass = $("#pass").val();
@@ -106,11 +106,27 @@
         var name = user.displayName;
         var data = {p:2, name:name, hand:null, time:null}
         var roomdb = db.collection("room").doc(room);
-        washingtonRef.update({
-          regions: firebase.firestore.FieldValue.arrayUnion()
+        roomdb.update({
+          wait: firebase.firestore.FieldValue.arrayUnion(name)
         });
+        roomdb.onSnapshot(function(doc){
+          var name2 = doc.data().user2;
+          if(name2 == name){
+            roomdb.update({user2:user}).then(function(){
+              unsubscribed();
+              battle();
+            }).catch(function(error){
+
+            })
+          }elif(!name2){
+
+          }else{
+            alert("拒否されました。やり直してください。");
+            return;
+          }
+        })
       }
-      
+
       $(function() {
         var firebaseConfig = {
           apiKey: "AIzaSyDRJRC_2rt1BdDTQjtZaZOs7d4BHUfa7V0",

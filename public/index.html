@@ -16,7 +16,7 @@
           type="button"
           id="createRoom"
           value="部屋を作る"
-          onclick="c()"
+          onclick="create()"
         /><br /><br />
         <div id="joinRoom">
           部屋に入る
@@ -37,8 +37,43 @@
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
 
     <script type="text/javascript">
-      function c() {
-        alert("cccccc");
+      function create() {
+        alert("clcik");
+        var room = $("#room").val();
+        var pass = $("#pass").val();
+        if (!room || !pass) {
+          alert("input error");
+          return;
+        }
+        var user = { p: 1, name: name, hand: null, time: null };
+        var roomdb = db.collection("room").doc(room);
+        window.addEventListner(
+          "beforeunload",
+          function() {
+            roomdb
+              .delete()
+              .then(function() {
+                return;
+              })
+              .catch(function(error) {
+                alert(error);
+              });
+          },
+          false
+        );
+        roomdb
+          .set({
+            pass: pass,
+            user1: user,
+            user2: null,
+            wait: []
+          })
+          .then(function() {
+            alert("success");
+          })
+          .catch(function(error) {
+            alert(error);
+          });
       }
       $(function() {
         var firebaseConfig = {
@@ -55,22 +90,12 @@
         var provider = new firebase.auth.GoogleAuthProvider();
         var db = firebase.firestore();
         /*firebase
-          .auth()
-          .signInWithEmailAndPassword(email, password)
-          .catch(function(error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.m*/
-        firebase
-          .auth()
-          .signOut()
-          .then(function() {
-            // Sign-out successfull.
-            alert("suc")
-          })
-          .catch(function(error) {
-            // An error happened.
-          });
+                .auth()
+                .signInWithEmailAndPassword(email, password)
+                .catch(function(error) {
+                  // Handle Errors here.
+                  var errorCode = error.code;
+                  var errorMessage = error.m*/
 
         firebase.auth().onAuthStateChanged(function(user) {
           if (user) {
@@ -78,12 +103,10 @@
             var displayName = user.displayName;
             var email = user.email;
             var uid = user.uid;
-            var providerData = user.providerData;
-            // ...
             alert(displayName);
             return;
           } else {
-            alert("login!!!");
+            alert("このゲームはGoogleへのログインが必要です。");
             firebase
               .auth()
               .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -104,98 +127,100 @@
         });
 
         /*function auth() {
-          alert("このアプリはGoogleでのログインが必要となります。");
-          firebase
-            .au
-            .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-            .then(function() {})
-            .catch(function(error) {
-              // Handle Errors here.
-              var errorCode = error.code;
-              var errorMessage = error.message;
-            });
-          firebase
-            .auth()
-            .signInWithPopup(provider)
-            .then(function(result) {
-              // This gives you a Google Access Token. You can use it to access the Google API.
-              var token = result.credential.accessToken;
-              // The signed-in user info.
-              var user = result.user;
+                alert("このアプリはGoogleでのログインが必要となります。");
+                firebase
+                  .au
+                  .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                  .then(function() {})
+                  .catch(function(error) {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                  });
+                firebase
+                  .auth()
+                  .signInWithPopup(provider)
+                  .then(function(result) {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    var token = result.credential.accessToken;
+                    // The signed-in user info.
+                    var user = result.user;
 
-              return user.displayName;
-            })
-            .catch(function(error) {
-              alert("alal");
-              return;
-            });
-        }*/
+                    return user.displayName;
+                  })
+                  .catch(function(error) {
+                    alert("alal");
+                    return;
+                  });
+              }*/
 
         /*firebase
-          .auth()
-          .getRedirectResult()
-          .then(function(result) {
-            if (result.credential) {
-              // This gives you a Google Access Token. You can use it to access the Google API.
-              var token = result.credential.accessToken;
-              // ...
-            }
-            // The signed-in user info.
-            var user = result.user;
-            name = user.displayName;
-          })
-          .catch(function(error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            // The email of the user's account used.
-            var email = error.email;
-            // The firebase.auth.AuthCredential type that was used.
-            var credential = error.credential;
-            // ...
-          });
-
-        function c() {
-          alert("cccccccc");
-        }*/
-        function onclk() {
-          alert("clcik");
-          var room = $("#room").val();
-          var pass = $("#pass").val();
-          if (!room || !pass) {
-            alert("input error");
-            return;
-          }
-          var user = { p: 1, name: name, hand: null, time: null };
-          var roomdb = db.collection("room").doc(room);
-          window.addEventListner(
-            "beforeunload",
-            function() {
-              roomdb
-                .delete()
-                .then(function() {
-                  return;
+                .auth()
+                .getRedirectResult()
+                .then(function(result) {
+                  if (result.credential) {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    var token = result.credential.accessToken;
+                    // ...
+                  }
+                  // The signed-in user info.
+                  var user = result.user;
+                  name = user.displayName;
                 })
                 .catch(function(error) {
-                  alert(error);
+                  // Handle Errors here.
+                  var errorCode = error.code;
+                  var errorMessage = error.message;
+                  // The email of the user's account used.
+                  var email = error.email;
+                  // The firebase.auth.AuthCredential type that was used.
+                  var credential = error.credential;
+                  // ...
                 });
-            },
-            false
-          );
-          roomdb
-            .set({
-              pass: pass,
-              user1: user,
-              user2: null,
-              wait: []
-            })
-            .then(function() {
-              alert("success");
-            })
-            .catch(function(error) {
-              alert(error);
-            });
-        }
+
+              function c() {
+                alert("cccccccc");
+              }*/
+        /*
+              function onclk() {
+                alert("clcik");
+                var room = $("#room").val();
+                var pass = $("#pass").val();
+                if (!room || !pass) {
+                  alert("input error");
+                  return;
+                }
+                var user = { p: 1, name: name, hand: null, time: null };
+                var roomdb = db.collection("room").doc(room);
+                window.addEventListner(
+                  "beforeunload",
+                  function() {
+                    roomdb
+                      .delete()
+                      .then(function() {
+                        return;
+                      })
+                      .catch(function(error) {
+                        alert(error);
+                      });
+                  },
+                  false
+                );
+                roomdb
+                  .set({
+                    pass: pass,
+                    user1: user,
+                    user2: null,
+                    wait: []
+                  })
+                  .then(function() {
+                    alert("success");
+                  })
+                  .catch(function(error) {
+                    alert(error);
+                  });
+              }
+              */
       });
     </script>
   </body>

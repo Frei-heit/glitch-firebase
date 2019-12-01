@@ -78,7 +78,10 @@
             alert("success");
             $("#match").css("display:noen;");
             roomdb.onSnapshot(function(doc){
-              
+              $("#people").append("<div class='waitPlayer'>"+wait[-1]+"<div>")
+            });
+            $(".waitPlayer").on(click,function(){
+              if(window.confirm(this.val()+"と対戦しますか？"))
             })
           })
           .catch(function(error) {

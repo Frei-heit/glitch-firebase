@@ -18,10 +18,10 @@
         </div>
       </div>
     </div>
-    <div id="wait1">
+    <div id="wait1" style="display:noen;">
       <div id="people"></div>
     </div>
-    <div style="display: none;">
+    <div id="battle" style="display: none;">
       対戦
     </div>
 
@@ -36,7 +36,7 @@
 
     <script type="text/javascript">
       function battle(){
-
+        alert("battle start!")
       }
 
       function create(db, user) {
@@ -74,14 +74,19 @@
           .then(function() {
             alert("success");
             $("#match").css("display:noen;");
+            $("#wait1").css("display:block;");
             roomdb.onSnapshot(function(doc){
-              $("#people").append("<div class='waitPlayer'>"+wait[-1]+"<div>")
+              alert(doc.data())
+              $("#people").append("<div class='waitPlayer'>"+doc.data().wait[-1]+"<div>")
             });
+            alert("snap ok")
             $(".waitPlayer").on(click,function(){
+              alert("click!!!!!")
               if(window.confirm(this.val()+"と対戦しますか？")){
                 db.update({user2.name: this.val()}).then(function(){
+                  alert("upsuc")
                   unsubscribe();
-                  battle();
+                  battle()
                 }).catch(function(error){
                   alert(error);
                   this.remove();
@@ -106,9 +111,11 @@
         var name = user.displayName;
         var data = {p:2, name:name, hand:null, time:null}
         var roomdb = db.collection("room").doc(room);
+        
         roomdb.update({
           wait: firebase.firestore.FieldValue.arrayUnion(name)
         });
+        
         roomdb.onSnapshot(function(doc){
           var name2 = doc.data().user2;
           if(name2 == name){

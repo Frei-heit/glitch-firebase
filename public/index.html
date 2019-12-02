@@ -74,8 +74,12 @@
             $("#match").css("display:noen;");
             $("#wait1").css("display:block;");
             roomdb.onSnapshot(function(doc){
-              alert(doc.data())
-              $("#people").append("<div class='waitPlayer'>"+doc.data().wait[-1]+"<div>")
+              if(doc.exists && doc.data().wait[0]){
+                $("#people").append("<div class='waitPlayer'>"+doc.data().wait.pop()+"<div>")
+              }else{
+                alert(JSON.stringify(doc.data()))
+                alert("doc no exist or no wait")
+              }
             });
             alert("snap ok")
             $(".waitPlayer").on("click",function(){
@@ -115,8 +119,7 @@
         });
         alert("wait")
         roomdb.onSnapshot(function(doc){
-          alert(doc.data())
-          var name2 = doc.data().user2;
+          var name2 = doc.data().user2.name;
           alert(name2)
           if(name2 == name){
             roomdb.update({user2:user}).then(function(){

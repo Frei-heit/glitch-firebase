@@ -78,10 +78,10 @@
               $("#people").append("<div class='waitPlayer'>"+doc.data().wait[-1]+"<div>")
             });
             alert("snap ok")
-            $(".waitPlayer").on(click,function(){
+            $(".waitPlayer").on("click",function(){
               alert("click!!!!!")
               if(window.confirm(this.val()+"と対戦しますか？")){
-                db.update({user2.name: this.val()}).then(function(){
+                db.update({user2: {name:this.val()}}).then(function(){
                   alert("upsuc")
                   unsubscribe();
                   battle()
@@ -126,7 +126,7 @@
             }).catch(function(error){
 
             })
-          }elif(!name2){
+          }else if(!name2){
 
           }else{
             alert("拒否されました。やり直してください。");

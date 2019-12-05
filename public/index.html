@@ -92,14 +92,15 @@
               alert("click!!!!!");
               let name2 = $(this).val();
               if (window.confirm(name2 + "と対戦しますか？")) {
+                unsubscribe();
                 roomdb.update({ user2: { name: name2 } })
                   .then(function() {
                     alert("upsuc");
-                    unsubscribe();
                     battle();
                   })
                   .catch(function(error) {
                     alert(error);
+                    alert("error has occured. please retry.")
                     $(this).remove();
                   });
               } else {
@@ -133,14 +134,17 @@
           alert(name2 == name)
           if (name2 == name) {
             alert("up start")
+            unsubscribe();
             roomdb
               .update({ user2: data })
               .then(function() {
                 alert("upsuc2");
-                unsubscribe();
                 battle();
               })
-              .catch(function(error) {});
+              .catch(function(error) {
+                alert(error)
+                alert("error has occured. please retry.")
+            });
           } else if (!name2) {
           } else {
             alert("拒否されました。やり直してください。");

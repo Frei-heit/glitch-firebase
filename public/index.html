@@ -16,7 +16,7 @@
         <input type="button" id="joinRoom" value="部屋に入る" />
       </div>
     </div>
-    <div id="wait1" style="display:noen;">
+    <div id="wait1" style="display:none;">
       <div id="people"></div>
     </div>
     <div id="battle" style="display: none;">
@@ -33,8 +33,8 @@
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
 
     <script type="text/javascript">
-      function battle(){
-        alert("battle start!")
+      function battle() {
+        alert("battle start!");
       }
 
       function create(db, user) {
@@ -71,71 +71,82 @@
           })
           .then(function() {
             alert("success");
-            $("#match").css("display:noen;");
-            $("#wait1").css("display:block;");
-            roomdb.onSnapshot(function(doc){
-              if(doc.exists && doc.data().wait[0]){
-                $("#people").append("<div class='waitPlayer'>"+doc.data().wait.pop()+"<div>")
-              }else{
-                alert(JSON.stringify(doc.data()))
-                alert("doc no exist or no wait")
+            $("#match").toggle();
+            $("#wait1").toggle();
+            var unsubscribe = roomdb.onSnapshot(function(doc) {
+              let d = doc.data();
+              if (d.wait[0]) {
+                alert(JSON.stringify(d));
+                $("#people").append(
+                  "<input type='button' class='waitPlayer' value='" +
+                    d.wait.pop() +
+                    "' />"
+                );
+              } else {
+                alert(JSON.stringify(d));
+                alert("no wait");
               }
             });
-            alert("snap ok")
-            $(".waitPlayer").on("click",function(){
-              alert("click!!!!!")
-              if(window.confirm(this.val()+"と対戦しますか？")){
-                db.update({user2: {name:this.val()}}).then(function(){
-                  alert("upsuc")
-                  unsubscribe();
-                  battle()
-                }).catch(function(error){
-                  alert(error);
-                  this.remove();
-                });
-              }else{
-                this.remove();
+            alert("snap ok");
+            $(document).on("click", ".waitPlayer", function() {
+              alert("click!!!!!");
+              let name2 = $(this).val();
+              if (window.confirm(name2 + "と対戦しますか？")) {
+                roomdb.update({ user2: { name: name2 } })
+                  .then(function() {
+                    alert("upsuc");
+                    unsubscribe();
+                    battle();
+                  })
+                  .catch(function(error) {
+                    alert(error);
+                    $(this).remove();
+                  });
+              } else {
+                $(this).remove();
               }
-            })
+            });
           })
           .catch(function(error) {
             alert(error);
           });
       }
 
-      function join(db, user){
+      function join(db, user) {
         var room = $("#room").val();
         var pass = $("#pass").val();
-        if(!room || !pass){
+        if (!room || !pass) {
           alert("input error");
           return;
         }
         var name = user.displayName;
-        var data = {p:2, name:name, hand:null, time:null}
+        var data = { p: 2, name: name, hand: null, time: null };
         var roomdb = db.collection("room").doc(room);
-        alert(name)
+        alert(name);
         roomdb.update({
           wait: firebase.firestore.FieldValue.arrayUnion(name)
         });
-        alert("wait")
-        roomdb.onSnapshot(function(doc){
+        alert("wait");
+        var unsubscribe = roomdb.onSnapshot(function(doc) {
           var name2 = doc.data().user2.name;
-          alert(name2)
-          if(name2 == name){
-            roomdb.update({user2:user}).then(function(){
-              alert("upsuc2")
-              unsubscribed();
-              battle();
-            }).catch(function(error){
-
-            })
-          }else if(!name2){
-
-          }else{
+          alert(name2);
+          alert(name2 == name)
+          if (name2 == name) {
+            alert("up start")
+            roomdb
+              .update({ user2: data })
+              .then(function() {
+                alert("upsuc2");
+                unsubscribe();
+                battle();
+              })
+              .catch(function(error) {});
+          } else if (!name2) {
+          } else {
             alert("拒否されました。やり直してください。");
             return;
           }
-        })
+        });
       }
 
       $(function() {
@@ -162,14 +173,14 @@
 
         firebase.auth().onAuthStateChanged(function(user) {
           if (user) {
-            alert(user.displayName)
+            alert(user.displayName);
             // User is signed in.
-            $("#createRoom").on("click",function(){
-              alert("click")
+            $("#createRoom").on("click", function() {
+              alert("click");
               create(db, user);
             });
-            $("#joinRoom").on("click",function(){
-              alert("click2")
+            $("#joinRoom").on("click", function() {
+              alert("click2");
               join(db, user);
             });
             return;

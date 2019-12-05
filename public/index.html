@@ -32,6 +32,17 @@
           ✌️
         </div>
       </div>
+      <div id="tkjp">
+        <div id="myhand"></div>
+        <div id="userhand"></div>
+        <div id="result"></div>
+        <div id="atack" style="display:none;">
+          叩く
+        </div>
+        <div id="defence" style="display:none;">
+          守る
+        </div>
+      </div>
     </div>
 
     <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
@@ -44,45 +55,86 @@
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
 
     <script type="text/javascript">
-      function TKJP(data, user2){
-        
+      function jankenResult(myhand, userhand){
+        var type = {✊:{✊:"あいこ",✌️:"勝ち",🖐:"負け"},
+                    ✌️:{✊:"負け",✌️:"あいこ",🖐:"勝ち"},
+                    🖐:{✊:"勝ち",✌️:"負け",🖐:"あいこ"}}
+        return type[myhand][userhand]
       }
-      function count(c){
-        $("#shText").val("じゃんけん "+c);
+      function TKJP(data, user) {
+        $("#tkjp").show();
+        var myhand = data.hand;
+        var userhand = user.hand;
+        if(!myhand || !userhand){
+          alert("error")
+          return janken()
+        }
+        var result = jankenResult(myhand, userhand);
+        $("#myhand").val(myhand)
+        $("#userhand").val(userhand)
+        $("#result").val(result)
+      }
+
+      function count(c) {
+        $("#shText").val("じゃんけん " + c);
       }
       function janken(roomdb, data) {
-        alert("battle start!");
-        $("#wait").toggle();
-        $("#battle").toggle();
-        $("#shText").val("最初は✊")
-        var c = 3
-        var countDown = setInterval(function(){
-          if(c != 0){
+        //alert("battle start!");
+        $("#wait").hidden();
+        $("#battle").show();
+        $(".hand").off();
+        $(".hand").on("click", function(){
+          data.hand = $(this).val();
+          $(".hand").css("border:none;")
+          $(this).css("border: solid 1px #F00")
+        })
+        $("#shText").val("最初は✊");
+        var c = 3;
+        var countDown = setInterval(function() {
+          if (c != 0) {
             count(c);
             c -= 1;
-          }else{
+          } else {
             clearInterval(countDown);
-            if(data.p == 1){
-              roomdb.update({
-                user1: data
-              }).then(function(){
-                window.setTimeout(function(){
-                  roomdb.get().then(function(doc){
-                    var d = doc.data()
-                    $("#selectHand").toggle();
-                    battleFunc(data, d.user2);
-                  }).catch(function(error){
-                    
-                  })
+            if (data.p == 1) {
+              roomdb
+                .update({
+                  user1: data
                 })
-              }).catch(function(error){
-                
-              })
-            }else{
-              
+                .then(function() {
+                  window.setTimeout(function() {
+                    roomdb
+                      .get()
+                      .then(function(doc) {
+                        var d = doc.data();
+                        $("#selectHand").hidden();
+                        battleFunc(data, d.user2);
+                      })
+                      .catch(function(error) {});
+                  });
+                })
+                .catch(function(error) {});
+            } else {
+              roomdb
+                .update({
+                  user2: data
+                })
+                .then(function() {
+                  window.setTimeout(function() {
+                    roomdb
+                      .get()
+                      .then(function(doc) {
+                        var d = doc.data();
+                        $("#selectHand").hidden();
+                        battleFunc(data, d.user1);
+                      })
+                      .catch(function(error) {});
+                  });
+                })
+                .catch(function(error) {});
             }
           }
-        }, 1000)
+        }, 1000);
       }
 
       function create(db, user) {
@@ -141,14 +193,15 @@
               let name2 = $(this).val();
               if (window.confirm(name2 + "と対戦しますか？")) {
                 unsubscribe();
-                roomdb.update({ user2: { name: name2 } })
+                roomdb
+                  .update({ user2: { name: name2 } })
                   .then(function() {
                     alert("upsuc");
                     janken();
                   })
                   .catch(function(error) {
                     alert(error);
-                    alert("error has occured. please retry.")
+                    alert("error has occured. please retry.");
                     $(this).remove();
                   });
               } else {
@@ -177,14 +230,14 @@
         });
         $("#match").toggle();
         $("#wait").toggle();
-        $("#people").val("wait now")
+        $("#people").val("wait now");
         alert("wait");
         var unsubscribe = roomdb.onSnapshot(function(doc) {
           var name2 = doc.data().user2.name;
           alert(name2);
-          alert(name2 == name)
+          alert(name2 == name);
           if (name2 == name) {
-            alert("up start")
+            alert("up start");
             unsubscribe();
             roomdb
               .update({ user2: data })
@@ -193,9 +246,9 @@
                 janken();
               })
               .catch(function(error) {
-                alert(error)
-                alert("error has occured. please retry.")
-            });
+                alert(error);
+                alert("error has occured. please retry.");
+              });
           } else if (!name2) {
           } else {
             alert("拒否されました。やり直してください。");
@@ -207,7 +260,7 @@
       $(function() {
         //select Game
         var battleFunction = TKJP;
-        
+
         var firebaseConfig = {
           apiKey: "AIzaSyDRJRC_2rt1BdDTQjtZaZOs7d4BHUfa7V0",
           authDomain: "glitch-48c07.firebaseapp.com",

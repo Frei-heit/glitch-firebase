@@ -16,11 +16,22 @@
         <input type="button" id="joinRoom" value="部屋に入る" />
       </div>
     </div>
-    <div id="wait1" style="display:none;">
+    <div id="wait" style="display:none;">
       <div id="people"></div>
     </div>
     <div id="battle" style="display: none;">
-      対戦
+      <div id="selectHand">
+        <div id="shText"></div>
+        <div id="pa" class="hand">
+          🖐
+        </div>
+        <div id="gu" class="hand">
+          ✊
+        </div>
+        <div id="ch" class="hand">
+          ✌️
+        </div>
+      </div>
     </div>
 
     <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
@@ -33,8 +44,45 @@
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
 
     <script type="text/javascript">
-      function battle() {
+      function TKJP(data, user2){
+        
+      }
+      function count(c){
+        $("#shText").val("じゃんけん "+c);
+      }
+      function janken(roomdb, data) {
         alert("battle start!");
+        $("#wait").toggle();
+        $("#battle").toggle();
+        $("#shText").val("最初は✊")
+        var c = 3
+        var countDown = setInterval(function(){
+          if(c != 0){
+            count(c);
+            c -= 1;
+          }else{
+            clearInterval(countDown);
+            if(data.p == 1){
+              roomdb.update({
+                user1: data
+              }).then(function(){
+                window.setTimeout(function(){
+                  roomdb.get().then(function(doc){
+                    var d = doc.data()
+                    $("#selectHand").toggle();
+                    battleFunc(data, d.user2);
+                  }).catch(function(error){
+                    
+                  })
+                })
+              }).catch(function(error){
+                
+              })
+            }else{
+              
+            }
+          }
+        }, 1000)
       }
 
       function create(db, user) {
@@ -72,7 +120,7 @@
           .then(function() {
             alert("success");
             $("#match").toggle();
-            $("#wait1").toggle();
+            $("#wait").toggle();
             var unsubscribe = roomdb.onSnapshot(function(doc) {
               let d = doc.data();
               if (d.wait[0]) {
@@ -96,7 +144,7 @@
                 roomdb.update({ user2: { name: name2 } })
                   .then(function() {
                     alert("upsuc");
-                    battle();
+                    janken();
                   })
                   .catch(function(error) {
                     alert(error);
@@ -127,6 +175,9 @@
         roomdb.update({
           wait: firebase.firestore.FieldValue.arrayUnion(name)
         });
+        $("#match").toggle();
+        $("#wait").toggle();
+        $("#people").val("wait now")
         alert("wait");
         var unsubscribe = roomdb.onSnapshot(function(doc) {
           var name2 = doc.data().user2.name;
@@ -139,7 +190,7 @@
               .update({ user2: data })
               .then(function() {
                 alert("upsuc2");
-                battle();
+                janken();
               })
               .catch(function(error) {
                 alert(error)
@@ -154,6 +205,9 @@
       }
 
       $(function() {
+        //select Game
+        var battleFunction = TKJP;
+        
         var firebaseConfig = {
           apiKey: "AIzaSyDRJRC_2rt1BdDTQjtZaZOs7d4BHUfa7V0",
           authDomain: "glitch-48c07.firebaseapp.com",

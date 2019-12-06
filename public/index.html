@@ -14,6 +14,7 @@
         pass<input type="text" name="pass" id="pass" />
         <input type="button" id="createRoom" value="部屋を作る" /><br /><br />
         <input type="button" id="joinRoom" value="部屋に入る" />
+        <input type="button" id="logout" value="log out" />
       </div>
     </div>
     <div id="wait" style="display:none;">
@@ -22,15 +23,9 @@
     <div id="battle" style="display: none;">
       <div id="selectHand">
         <div id="shText"></div>
-        <div id="pa" class="hand">
-          🖐
-        </div>
-        <div id="gu" class="hand">
-          ✊
-        </div>
-        <div id="ch" class="hand">
-          ✌️
-        </div>
+        <div id="pa" class="hand">パー</div>
+        <div id="gu" class="hand">グー</div>
+        <div id="ch" class="hand">チョキ</div>
       </div>
       <div id="tkjp">
         <div id="myhand"></div>
@@ -55,40 +50,42 @@
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
 
     <script type="text/javascript">
-      function jankenResult(myhand, userhand){
-        var type = {✊:{✊:"あいこ",✌️:"勝ち",🖐:"負け"},
-                    ✌️:{✊:"負け",✌️:"あいこ",🖐:"勝ち"},
-                    🖐:{✊:"勝ち",✌️:"負け",🖐:"あいこ"}}
-        return type[myhand][userhand]
+      function jankenResult(myhand, userhand) {
+        var type = {
+          グー: { グー: "あいこ", チョキ: "勝ち", パー: "負け" },
+          チョキ: { グー: "負け", チョキ: "あいこ", パー: "勝ち" },
+          パー: { グー: "勝ち", チョキ: "負け", パー: "あいこ" }
+        };
+        return type[myhand][userhand];
       }
-      function TKJP(data, user) {
+      function TKJP(roomdb, data, user) {
         $("#tkjp").show();
         var myhand = data.hand;
         var userhand = user.hand;
-        if(!myhand || !userhand){
-          alert("error")
-          return janken()
+        if (!myhand || !userhand) {
+          alert("error");
+          return janken(roomdb, data);
         }
         var result = jankenResult(myhand, userhand);
-        $("#myhand").val(myhand)
-        $("#userhand").val(userhand)
-        $("#result").val(result)
+        $("#myhand").text(myhand);
+        $("#userhand").text(userhand);
+        $("#result").text(result);
       }
 
       function count(c) {
-        $("#shText").val("じゃんけん " + c);
+        $("#shText").text("じゃんけん " + c);
       }
       function janken(roomdb, data) {
         //alert("battle start!");
-        $("#wait").hidden();
+        $("#wait").hide();
         $("#battle").show();
         $(".hand").off();
-        $(".hand").on("click", function(){
-          data.hand = $(this).val();
-          $(".hand").css("border:none;")
-          $(this).css("border: solid 1px #F00")
-        })
-        $("#shText").val("最初は✊");
+        $(".hand").on("touchend", function() {
+          data.hand = $(this).text();
+          $(".hand").css("border", "none");
+          $(this).css("border", "solid 1px #F00");
+        });
+        $("#shText").text("最初はグー");
         var c = 3;
         var countDown = setInterval(function() {
           if (c != 0) {
@@ -107,11 +104,13 @@
                       .get()
                       .then(function(doc) {
                         var d = doc.data();
-                        $("#selectHand").hidden();
-                        battleFunc(data, d.user2);
+                        $("#selectHand").hide();
+                        TKJP(roomdb, data, d.user2);
                       })
-                      .catch(function(error) {});
-                  });
+                      .catch(function(error) {
+                        alert(error);
+                      });
+                  }, 1000);
                 })
                 .catch(function(error) {});
             } else {
@@ -125,10 +124,12 @@
                       .get()
                       .then(function(doc) {
                         var d = doc.data();
-                        $("#selectHand").hidden();
-                        battleFunc(data, d.user1);
+                        $("#selectHand").hide();
+                        TKJP(roomdb, data, d.user1);
                       })
-                      .catch(function(error) {});
+                      .catch(function(error) {
+                        alert(error);
+                      });
                   });
                 })
                 .catch(function(error) {});
@@ -147,8 +148,8 @@
         var name = user.displayName;
         var data = { p: 1, name: name, hand: null, time: null };
         var roomdb = db.collection("room").doc(room);
-        /*
-        window.addEventListner(
+        
+        $(window).on(
           "beforeunload",
           function() {
             roomdb
@@ -159,9 +160,8 @@
               .catch(function(error) {
                 alert(error);
               });
-          },
-          false
-        );*/
+          }
+        );
         roomdb
           .set({
             pass: pass,
@@ -170,34 +170,27 @@
             wait: []
           })
           .then(function() {
-            alert("success");
             $("#match").toggle();
             $("#wait").toggle();
             var unsubscribe = roomdb.onSnapshot(function(doc) {
               let d = doc.data();
               if (d.wait[0]) {
-                alert(JSON.stringify(d));
                 $("#people").append(
                   "<input type='button' class='waitPlayer' value='" +
                     d.wait.pop() +
                     "' />"
                 );
               } else {
-                alert(JSON.stringify(d));
-                alert("no wait");
               }
             });
-            alert("snap ok");
             $(document).on("click", ".waitPlayer", function() {
-              alert("click!!!!!");
               let name2 = $(this).val();
               if (window.confirm(name2 + "と対戦しますか？")) {
                 unsubscribe();
                 roomdb
                   .update({ user2: { name: name2 } })
                   .then(function() {
-                    alert("upsuc");
-                    janken();
+                    janken(roomdb, data);
                   })
                   .catch(function(error) {
                     alert(error);
@@ -224,26 +217,20 @@
         var name = user.displayName;
         var data = { p: 2, name: name, hand: null, time: null };
         var roomdb = db.collection("room").doc(room);
-        alert(name);
         roomdb.update({
           wait: firebase.firestore.FieldValue.arrayUnion(name)
         });
         $("#match").toggle();
         $("#wait").toggle();
-        $("#people").val("wait now");
-        alert("wait");
+        $("#people").text("wait now");
         var unsubscribe = roomdb.onSnapshot(function(doc) {
           var name2 = doc.data().user2.name;
-          alert(name2);
-          alert(name2 == name);
           if (name2 == name) {
-            alert("up start");
             unsubscribe();
             roomdb
               .update({ user2: data })
               .then(function() {
-                alert("upsuc2");
-                janken();
+                janken(roomdb, data);
               })
               .catch(function(error) {
                 alert(error);
@@ -274,6 +261,18 @@
 
         var provider = new firebase.auth.GoogleAuthProvider();
         var db = firebase.firestore();
+
+        $("#logout").on("click", function() {
+          firebase
+            .auth()
+            .signOut()
+            .then(function() {
+              alert("Log Outしました。");
+            })
+            .catch(function(error) {
+              // An error happened.
+            });
+        });
         /*firebase
                 .auth()
                 .signInWithEmailAndPassword(email, password)
@@ -287,11 +286,9 @@
             alert(user.displayName);
             // User is signed in.
             $("#createRoom").on("click", function() {
-              alert("click");
               create(db, user);
             });
             $("#joinRoom").on("click", function() {
-              alert("click2");
               join(db, user);
             });
             return;

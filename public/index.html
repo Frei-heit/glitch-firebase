@@ -31,6 +31,7 @@
         <div id="myhand"></div>
         <div id="userhand"></div>
         <div id="result"></div>
+        <input type="button" id="next" value="next" />
         <div id="atack" style="display:none;">
           叩く
         </div>
@@ -70,6 +71,40 @@
         $("#myhand").text(myhand);
         $("#userhand").text(userhand);
         $("#result").text(result);
+        $("#next").show();
+        var unsubscribe = roomdb.onSnapshot(function(doc) {
+          if (doc.data().next == 2) {
+            unsubscribe();
+            roomdb.update({
+              next: 0
+            });
+            janken(roomdb, data);
+          }
+        });
+        $("#next").off();
+        $("#next").on("click", function() {
+          $("#tkjp").hide();
+          $("#wait").show();
+          $("#people").text("wait now");
+          var check = false;
+          roomdb
+            .get()
+            .then(function(doc) {
+              if (doc.data().next == 1) {
+                unsubscribe();
+                check = true;
+              }
+              roomdb.update({
+                next: firebase.firestore.FieldValue.increment(1)
+              });
+              if (check) {
+                janken(roomdb, data);
+              }
+            })
+            .catch(function(error) {
+              alert(error);
+            });
+        });
       }
 
       function count(c) {
@@ -79,6 +114,8 @@
         //alert("battle start!");
         $("#wait").hide();
         $("#battle").show();
+        $("#selectHand").show()
+        $("#next").hide();
         $(".hand").off();
         $(".hand").on("touchend", function() {
           data.hand = $(this).text();
@@ -148,26 +185,24 @@
         var name = user.displayName;
         var data = { p: 1, name: name, hand: null, time: null };
         var roomdb = db.collection("room").doc(room);
-        
-        $(window).on(
-          "beforeunload",
-          function() {
-            roomdb
-              .delete()
-              .then(function() {
-                return;
-              })
-              .catch(function(error) {
-                alert(error);
-              });
-          }
-        );
+
+        $(window).on("beforeunload", function() {
+          roomdb
+            .delete()
+            .then(function() {
+              return;
+            })
+            .catch(function(error) {
+              alert(error);
+            });
+        });
         roomdb
           .set({
             pass: pass,
             user1: data,
             user2: {},
-            wait: []
+            wait: [],
+            next: 0
           })
           .then(function() {
             $("#match").toggle();
@@ -245,9 +280,6 @@
       }
 
       $(function() {
-        //select Game
-        var battleFunction = TKJP;
-
         var firebaseConfig = {
           apiKey: "AIzaSyDRJRC_2rt1BdDTQjtZaZOs7d4BHUfa7V0",
           authDomain: "glitch-48c07.firebaseapp.com",

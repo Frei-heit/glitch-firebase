@@ -70,6 +70,7 @@
         var result = jankenResult(myhand, userhand);
         $("#myhand").text(myhand);
         $("#userhand").text(userhand);
+        
         $("#result").text(result);
         $("#next").show();
         var unsubscribe = roomdb.onSnapshot(function(doc) {
